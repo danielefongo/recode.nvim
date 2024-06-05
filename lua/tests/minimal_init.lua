@@ -5,6 +5,7 @@ end
 local M = {}
 local needed_plugins = {
   "nvim-lua/plenary.nvim",
+  "nvim-treesitter/nvim-treesitter",
 }
 
 function M.root(root)
