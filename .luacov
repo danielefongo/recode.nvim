@@ -1,0 +1,11 @@
+return {
+  include = { "lua/refactor/.+$" },
+  exclude = {
+    "lua/tests/.+$",
+  },
+  modules = {
+    ["refactor.*"] = "lua/",
+  },
+  includeuntestedfiles = true,
+}
+-- vim:ft=lua
