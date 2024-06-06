@@ -25,13 +25,18 @@ local function insert_sorted(nodes, new_node)
 end
 
 ---@return Node[]
----@param source string
+---@param source string | number
 ---@param ft string
 ---@param raw_query string
 function M.get_nodes(source, ft, raw_query)
   local lang = language.get_lang(ft) or ft
 
-  local root = ts.get_string_parser(source, lang):parse()[1]:root()
+  local root
+  if type(source) == "number" then
+    root = ts.get_parser(source, lang):parse()[1]:root()
+  else
+    root = ts.get_string_parser(source, lang):parse()[1]:root()
+  end
   local query = parse(lang, raw_query)
 
   local nodes = {}

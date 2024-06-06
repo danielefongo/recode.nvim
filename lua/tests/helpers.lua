@@ -16,4 +16,10 @@ function helpers.setup(opts)
   setup_test_cov()
 end
 
+function helpers.buf_with_text(text)
+  local buffer = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(buffer, 0, -1, true, vim.split(text, "\n"))
+  return buffer
+end
+
 return helpers
