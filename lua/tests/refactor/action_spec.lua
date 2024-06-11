@@ -1,0 +1,111 @@
+local helpers = require("tests.helpers")
+local Action = require("refactor.action")
+local Range = require("refactor.range")
+local Cursor = require("refactor.cursor")
+
+describe("action", function()
+  helpers.setup()
+
+  local function assert_text_in_buf(buffer, text)
+    assert.are.same(text, table.concat(vim.api.nvim_buf_get_lines(buffer, 0, -1, true), "\n"))
+  end
+
+  describe("insert", function()
+    it("buffer", function()
+      local buffer = helpers.buf_with_text([[
+simple text
+inside a buffer
+]])
+
+      Action.insert(buffer, Cursor.new(1, 9), "modified "):apply()
+
+      assert_text_in_buf(
+        buffer,
+        [[
+simple text
+inside a modified buffer
+]]
+      )
+    end)
+  end)
+
+  describe("remove", function()
+    it("buffer", function()
+      local buffer = helpers.buf_with_text([[
+simple text
+inside a <remove this> buffer
+]])
+
+      Action.remove(buffer, Range.new(1, 9, 1, 23)):apply()
+
+      assert_text_in_buf(
+        buffer,
+        [[
+simple text
+inside a buffer
+]]
+      )
+    end)
+  end)
+
+  describe("many", function()
+    it("already in order", function()
+      local buffer = helpers.buf_with_text([[
+simple text
+inside a buffer
+]])
+
+      Action.apply_many({
+        Action.insert(buffer, Cursor.new(1, 9), "modified "),
+        Action.insert(buffer, Cursor.new(1, 8), "n extra"),
+      })
+
+      assert_text_in_buf(
+        buffer,
+        [[
+simple text
+inside an extra modified buffer
+]]
+      )
+    end)
+
+    it("not in order", function()
+      local buffer = helpers.buf_with_text([[
+simple text
+inside a buffer
+]])
+
+      Action.apply_many({
+        Action.insert(buffer, Cursor.new(1, 8), "n extra"),
+        Action.insert(buffer, Cursor.new(1, 9), "modified "),
+      })
+
+      assert_text_in_buf(
+        buffer,
+        [[
+simple text
+inside an extra modified buffer
+]]
+      )
+    end)
+
+    it("remove and insert", function()
+      local buffer = helpers.buf_with_text([[
+simple text
+inside a buffer
+]])
+
+      Action.apply_many({
+        Action.insert(buffer, Cursor.new(0, 6), " changed"),
+        Action.remove(buffer, Range.new(0, 6, 1, 8)),
+      })
+
+      assert_text_in_buf(
+        buffer,
+        [[
+simple changed buffer
+]]
+      )
+    end)
+  end)
+end)
