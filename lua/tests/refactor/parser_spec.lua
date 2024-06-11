@@ -1,5 +1,5 @@
 local helpers = require("tests.helpers")
-local parser = require("refactor.parser")
+local Parser = require("refactor.parser")
 
 describe("parser", function()
   helpers.setup()
@@ -14,7 +14,7 @@ describe("parser", function()
         type = node.type,
         range = node.range:to_vim(),
       }
-    end, parser.get_nodes(source, ft, raw_query))
+    end, Parser.get_nodes(source, ft, raw_query))
   end
 
   describe("for strings", function()

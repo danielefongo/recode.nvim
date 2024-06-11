@@ -1,5 +1,5 @@
-local node = require("refactor.node")
-local range = require("refactor.range")
+local Node = require("refactor.node")
+local Range = require("refactor.range")
 
 local M = {}
 
@@ -47,12 +47,12 @@ function M.get_nodes(source, ft, raw_query)
       local capture = match[idx]
 
       if capture then
-        local node_range = range.new(capture:range())
+        local node_range = Range.new(capture:range())
         local node_range_string = node_range:to_string()
 
         local text = vim.treesitter.get_node_text(capture, source)
         if not node_ranges[node_range_string] then
-          insert_sorted(nodes, node.new(type, node_range, capture, text))
+          insert_sorted(nodes, Node.new(type, node_range, capture, text))
         end
         node_ranges[node_range_string] = 1
       end
