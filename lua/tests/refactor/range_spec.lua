@@ -39,10 +39,14 @@ describe("range", function()
 
     it("is true if it does", function()
       local range = Range.new(0, 10, 3, 5)
-      assert.are.same(true, range:contains_range(Range.new(0, 10, 3, 5)))
       assert.are.same(true, range:contains_range(Range.new(0, 10, 2, 0)))
       assert.are.same(true, range:contains_range(Range.new(2, 0, 2, 1)))
       assert.are.same(true, range:contains_range(Range.new(2, 0, 3, 5)))
+    end)
+
+    it("is false if equal", function()
+      local range = Range.new(0, 10, 3, 5)
+      assert.are.same(false, range:contains_range(Range.new(0, 10, 3, 5)))
     end)
   end)
 

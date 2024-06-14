@@ -24,6 +24,9 @@ end
 ---@return boolean
 ---@param range Range
 function M:contains_range(range)
+  if vim.deep_equal(self, range) then
+    return false
+  end
   if
     range.start_line < self.start_line or (range.start_line == self.start_line and range.start_col < self.start_col)
   then
