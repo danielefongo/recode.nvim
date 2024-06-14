@@ -1,6 +1,6 @@
 use crate::common::add_one;
 
-fn my_function(param1: i32, param2: i32) {
+pub fn my_function(param1: i32, param2: i32) {
     let param3: i32 = 3;
     let param4: i32 = 3;
     let x = match param1 {

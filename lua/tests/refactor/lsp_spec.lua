@@ -12,7 +12,7 @@ describe("lsp", function()
       local definition = helpers.with_lsp(Lsp.definition, buf, Cursor.new(5, 18))
 
       assert.are.same({
-        range = Range.new(2, 15, 2, 21),
+        range = Range.new(2, 19, 2, 25),
         file = string.format("%s/lua/tests/example/src/lsp.rs", vim.fn.getcwd()),
       }, definition)
     end)
@@ -26,7 +26,22 @@ describe("lsp", function()
           file = string.format("%s/lua/tests/example/src/lsp.rs", vim.fn.getcwd()),
         },
         {
-          range = Range.new(2, 15, 2, 21),
+          range = Range.new(2, 19, 2, 25),
+          file = string.format("%s/lua/tests/example/src/lsp.rs", vim.fn.getcwd()),
+        },
+      }, references)
+    end)
+
+    it("incoming calls", function()
+      local references = helpers.with_lsp(Lsp.incoming_calls, buf, Cursor.new(7, 14))
+
+      assert.are.same({
+        {
+          range = Range.new(7, 13, 7, 20),
+          file = string.format("%s/lua/tests/example/src/lsp.rs", vim.fn.getcwd()),
+        },
+        {
+          range = Range.new(11, 13, 11, 20),
           file = string.format("%s/lua/tests/example/src/lsp.rs", vim.fn.getcwd()),
         },
       }, references)
@@ -62,6 +77,17 @@ describe("lsp", function()
         {
           range = Range.new(0, 7, 0, 14),
           file = string.format("%s/lua/tests/example/src/common.rs", vim.fn.getcwd()),
+        },
+      }, references)
+    end)
+
+    it("incoming calls", function()
+      local references = helpers.with_lsp(Lsp.incoming_calls, buf, Cursor.new(2, 7))
+
+      assert.are.same({
+        {
+          range = Range.new(6, 4, 6, 15),
+          file = string.format("%s/lua/tests/example/src/lib.rs", vim.fn.getcwd()),
         },
       }, references)
     end)

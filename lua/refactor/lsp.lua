@@ -5,17 +5,18 @@ local M = {}
 ---@param action string
 ---@param buf integer
 ---@param cursor Cursor
-local function request(action, buf, cursor)
-  local params = {
-    textDocument = { uri = vim.uri_from_bufnr(buf) },
-    position = { line = cursor.line, character = cursor.col },
-    context = { includeDeclaration = true },
-  }
+local function request(action, buf, cursor, custom_params)
+  local params = custom_params
+    or {
+      textDocument = { uri = vim.uri_from_bufnr(buf) },
+      position = { line = cursor.line, character = cursor.col },
+      context = { includeDeclaration = true },
+    }
 
   local results = vim.lsp.buf_request_sync(buf, action, params, 5000)
 
   -- TODO: hardcoded 1
-  return results and results[1] and results[1].result
+  return results and results[1] and results[1].result or {}
 end
 
 ---@class LspElement
@@ -42,7 +43,7 @@ function M.definition(buf, cursor)
   end
 end
 
----@return LspElement[] | nil
+---@return LspElement[]
 ---@param buf integer
 ---@param cursor Cursor
 function M.references(buf, cursor)
@@ -61,6 +62,28 @@ function M.references(buf, cursor)
   end, references)
 
   return final_references
+end
+
+---@return LspElement[]
+---@param buf integer
+---@param cursor Cursor
+function M.incoming_calls(buf, cursor)
+  local call_item = request("textDocument/prepareCallHierarchy", buf, cursor)[1]
+  local lsp_references = request("callHierarchy/incomingCalls", buf, cursor, { item = call_item })
+
+  local references = {}
+
+  for _, reference in pairs(lsp_references) do
+    local file = string.gsub(reference.from.uri, "file://", "")
+    for _, range in pairs(reference.fromRanges) do
+      references[#references + 1] = {
+        range = Range.new(range.start.line, range.start.character, range["end"].line, range["end"].character),
+        file = file,
+      }
+    end
+  end
+
+  return references
 end
 
 return M
