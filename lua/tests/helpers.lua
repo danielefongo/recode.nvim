@@ -68,4 +68,14 @@ function helpers.buf_write(buffer, text)
   vim.api.nvim_buf_set_lines(buffer, 0, -1, true, vim.split(text, "\n"))
 end
 
+function helpers.temp_file(content)
+  local filename = os.tmpname()
+  local f = io.open(filename, "w")
+  if f then
+    f:write(content)
+    f:close()
+  end
+  return filename
+end
+
 return helpers

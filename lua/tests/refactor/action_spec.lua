@@ -10,6 +10,10 @@ describe("action", function()
     assert.are.same(text, table.concat(vim.api.nvim_buf_get_lines(buffer, 0, -1, true), "\n"))
   end
 
+  local function assert_text_in_file(file, text)
+    assert.are.same(text, io.open(file, "r"):read("*a"))
+  end
+
   describe("insert", function()
     it("buffer", function()
       local buffer = helpers.buf_with_text([[
@@ -25,6 +29,49 @@ inside a buffer
 simple text
 inside a modified buffer
 ]]
+      )
+    end)
+
+    it("file", function()
+      local filename = helpers.temp_file([[
+simple text
+inside a buffer
+]])
+
+      Action.insert(filename, Cursor.new(1, 9), "modified "):apply()
+
+      assert_text_in_file(
+        filename,
+        [[
+simple text
+inside a modified buffer
+]]
+      )
+    end)
+
+    it("opened file", function()
+      local filename = helpers.temp_file([[
+simple text
+inside a buffer
+]])
+
+      local buffer = helpers.buf_with_file(filename, "text")
+
+      Action.insert(filename, Cursor.new(1, 9), "modified "):apply()
+
+      assert_text_in_file(
+        filename,
+        [[
+simple text
+inside a buffer
+]]
+      )
+
+      assert_text_in_buf(
+        buffer,
+        [[
+simple text
+inside a modified buffer]]
       )
     end)
   end)
@@ -44,6 +91,48 @@ inside a <remove this> buffer
 simple text
 inside a buffer
 ]]
+      )
+    end)
+
+    it("file", function()
+      local filename = helpers.temp_file([[
+simple text
+inside a <remove this> buffer
+]])
+
+      Action.remove(filename, Range.new(1, 9, 1, 23)):apply()
+
+      assert_text_in_file(
+        filename,
+        [[
+simple text
+inside a buffer
+]]
+      )
+    end)
+
+    it("opened file", function()
+      local filename = helpers.temp_file([[
+simple text
+inside a <remove this> buffer
+]])
+      local buffer = helpers.buf_with_file(filename, "text")
+
+      Action.remove(filename, Range.new(1, 9, 1, 23)):apply()
+
+      assert_text_in_file(
+        filename,
+        [[
+simple text
+inside a <remove this> buffer
+]]
+      )
+
+      assert_text_in_buf(
+        buffer,
+        [[
+simple text
+inside a buffer]]
       )
     end)
   end)
