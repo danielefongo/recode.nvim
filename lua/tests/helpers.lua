@@ -21,6 +21,7 @@ end
 
 -- helpers
 
+local first_lsp_call = true
 local helpers = {}
 
 function helpers.setup(opts)
@@ -29,7 +30,7 @@ function helpers.setup(opts)
   setup_test_cov()
 end
 
-function helpers.async(after, lambda, ...)
+function helpers.with_lsp(lambda, ...)
   local args = { ... }
   local out = nil
 
@@ -37,8 +38,10 @@ function helpers.async(after, lambda, ...)
   vim.defer_fn(function()
     out = lambda(unpack(args))
 
+    first_lsp_call = false
+
     coroutine.resume(co)
-  end, after)
+  end, (first_lsp_call and 1000) or 0)
 
   coroutine.yield()
   return out

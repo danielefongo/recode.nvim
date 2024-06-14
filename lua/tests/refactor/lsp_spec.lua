@@ -9,7 +9,7 @@ describe("lsp", function()
 
   describe("same file", function()
     it("definition", function()
-      local definition = helpers.async(600, Lsp.definition, buf, Cursor.new(5, 18))
+      local definition = helpers.with_lsp(Lsp.definition, buf, Cursor.new(5, 18))
 
       assert.are.same({
         range = Range.new(2, 15, 2, 21),
@@ -18,7 +18,7 @@ describe("lsp", function()
     end)
 
     it("references", function()
-      local references = helpers.async(600, Lsp.references, buf, Cursor.new(5, 18))
+      local references = helpers.with_lsp(Lsp.references, buf, Cursor.new(5, 18))
 
       assert.are.same({
         {
@@ -35,7 +35,7 @@ describe("lsp", function()
 
   describe("other file", function()
     it("definition", function()
-      local definition = helpers.async(600, Lsp.definition, buf, Cursor.new(7, 13))
+      local definition = helpers.with_lsp(Lsp.definition, buf, Cursor.new(7, 13))
 
       assert.are.same({
         range = Range.new(0, 0, 2, 1),
@@ -44,7 +44,7 @@ describe("lsp", function()
     end)
 
     it("references", function()
-      local references = helpers.async(600, Lsp.references, buf, Cursor.new(7, 13))
+      local references = helpers.with_lsp(Lsp.references, buf, Cursor.new(7, 13))
 
       assert.are.same({
         {
