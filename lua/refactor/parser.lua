@@ -52,7 +52,7 @@ function M.get_nodes(source, ft, raw_query)
 
       if capture then
         local node_range = Range.new(capture:range())
-        local node_range_string = node_range:to_string()
+        local node_range_string = node_range:to_string() .. type
 
         local text = vim.treesitter.get_node_text(capture, source)
         if not node_ranges[node_range_string] then

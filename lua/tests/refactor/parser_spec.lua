@@ -103,6 +103,21 @@ fn my_function(param1: i32, param2: i32) -> i32 {
         { type = "identifier", range = { 3, 9, 3, 15 } },
       }, nodes)
     end)
+
+    it("for splitted query with duplicates", function()
+      local code = [[42]]
+      local ft = "rust"
+      local query = [[ ; query
+      ((integer_literal) @a)
+      ((_) @b)
+    ]]
+
+      local nodes = parse(code, ft, query)
+      assert.are.same({
+        { type = "b", range = { 0, 0, 0, 2 } },
+        { type = "a", range = { 0, 0, 0, 2 } },
+      }, nodes)
+    end)
   end)
 
   it("for buffer", function()
