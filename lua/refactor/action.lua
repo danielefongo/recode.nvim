@@ -3,7 +3,6 @@ local Range = require("refactor.range")
 ---@alias Source string | number
 
 ---@class Action
----@field type "insert"|"remove"
 ---@field source Source
 ---@field range Range
 ---@field text string
@@ -17,7 +16,6 @@ M.__index = M
 function M.insert(source, cursor, text)
   local self = setmetatable({}, M)
 
-  self.type = "insert"
   self.source = source
   self.range = Range.from_cursor(cursor)
   self.text = text
@@ -31,10 +29,22 @@ end
 function M.remove(source, range)
   local self = setmetatable({}, M)
 
-  self.type = "remove"
   self.source = source
   self.range = range
   self.text = ""
+
+  return self
+end
+
+---@return Action
+---@param source Source
+---@param range Range
+function M.replace(source, range, text)
+  local self = setmetatable({}, M)
+
+  self.source = source
+  self.range = range
+  self.text = text
 
   return self
 end
@@ -68,10 +78,7 @@ function M:apply()
     end
   end
 
-  local text = {}
-  if self.type == "insert" then
-    text = vim.split(self.text, "\n")
-  end
+  local text = vim.split(self.text, "\n")
 
   if not buf then
     return

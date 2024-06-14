@@ -197,4 +197,66 @@ simple changed buffer
       )
     end)
   end)
+
+  describe("replace", function()
+    it("buffer", function()
+      local buffer = helpers.buf_with_text([[
+simple text
+inside a buffer
+]])
+
+      Action.replace(buffer, Range.new(0, 0, 0, 6), "a"):apply()
+
+      assert_text_in_buf(
+        buffer,
+        [[
+a text
+inside a buffer
+]]
+      )
+    end)
+
+    it("file", function()
+      local filename = helpers.temp_file([[
+simple text
+inside a buffer
+]])
+
+      Action.replace(filename, Range.new(0, 0, 0, 6), "a"):apply()
+
+      assert_text_in_file(
+        filename,
+        [[
+a text
+inside a buffer
+]]
+      )
+    end)
+
+    it("opened file", function()
+      local filename = helpers.temp_file([[
+simple text
+inside a buffer
+]])
+
+      local buffer = helpers.buf_with_file(filename, "text")
+
+      Action.replace(filename, Range.new(0, 0, 0, 6), "a"):apply()
+
+      assert_text_in_file(
+        filename,
+        [[
+simple text
+inside a buffer
+]]
+      )
+
+      assert_text_in_buf(
+        buffer,
+        [[
+a text
+inside a buffer]]
+      )
+    end)
+  end)
 end)
