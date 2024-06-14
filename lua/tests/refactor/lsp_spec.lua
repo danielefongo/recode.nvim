@@ -1,16 +1,15 @@
 local helpers = require("tests.helpers")
 local Lsp = require("refactor.lsp")
 local Range = require("refactor.range")
+local Cursor = require("refactor.cursor")
 
 describe("lsp", function()
   helpers.setup()
+  local buf, win = helpers.buf_with_file("./lua/tests/example/src/lsp.rs", "rust")
 
   describe("same file", function()
     it("definition", function()
-      local buf, win = helpers.buf_with_file("./lua/tests/example/src/lsp.rs", "rust")
-      vim.api.nvim_win_set_cursor(win, { 6, 18 })
-
-      local definition = helpers.async(600, Lsp.definition, win, buf)
+      local definition = helpers.async(600, Lsp.definition, buf, Cursor.new(5, 18))
 
       assert.are.same({
         range = Range.new(2, 15, 2, 21),
@@ -19,10 +18,7 @@ describe("lsp", function()
     end)
 
     it("references", function()
-      local buf, win = helpers.buf_with_file("./lua/tests/example/src/lsp.rs", "rust")
-      vim.api.nvim_win_set_cursor(win, { 6, 18 })
-
-      local references = helpers.async(600, Lsp.references, win, buf)
+      local references = helpers.async(600, Lsp.references, buf, Cursor.new(5, 18))
 
       assert.are.same({
         {
@@ -39,10 +35,7 @@ describe("lsp", function()
 
   describe("other file", function()
     it("definition", function()
-      local buf, win = helpers.buf_with_file("./lua/tests/example/src/lsp.rs", "rust")
-      vim.api.nvim_win_set_cursor(win, { 8, 13 })
-
-      local definition = helpers.async(600, Lsp.definition, win, buf)
+      local definition = helpers.async(600, Lsp.definition, buf, Cursor.new(7, 13))
 
       assert.are.same({
         range = Range.new(0, 0, 2, 1),
@@ -51,10 +44,7 @@ describe("lsp", function()
     end)
 
     it("references", function()
-      local buf, win = helpers.buf_with_file("./lua/tests/example/src/lsp.rs", "rust")
-      vim.api.nvim_win_set_cursor(win, { 8, 13 })
-
-      local references = helpers.async(600, Lsp.references, win, buf)
+      local references = helpers.async(600, Lsp.references, buf, Cursor.new(7, 13))
 
       assert.are.same({
         {

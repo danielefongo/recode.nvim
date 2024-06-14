@@ -2,11 +2,15 @@ local Range = require("refactor.range")
 local M = {}
 
 ---@return table
----@param win integer
+---@param action string
 ---@param buf integer
-local function request(action, win, buf)
-  local params = vim.lsp.util.make_position_params(win, "utf-8")
-  params.context = { includeDeclaration = true }
+---@param cursor Cursor
+local function request(action, buf, cursor)
+  local params = {
+    textDocument = { uri = vim.uri_from_bufnr(buf) },
+    position = { line = cursor.line, character = cursor.col },
+    context = { includeDeclaration = true },
+  }
 
   local results = vim.lsp.buf_request_sync(buf, action, params, 5000)
 
@@ -19,10 +23,10 @@ end
 ---@field uri string
 
 ---@return LspElement | nil
----@param win integer
 ---@param buf integer
-function M.definition(win, buf)
-  local definitions = request("textDocument/definition", win, buf)
+---@param cursor Cursor
+function M.definition(buf, cursor)
+  local definitions = request("textDocument/definition", buf, cursor)
   local lsp_range = definitions and definitions[1] and definitions[1].targetRange
 
   if lsp_range then
@@ -39,11 +43,10 @@ function M.definition(win, buf)
 end
 
 ---@return LspElement[] | nil
----@param win integer
 ---@param buf integer
-function M.references(win, buf)
-  local references = request("textDocument/references", win, buf)
-  -- print(vim.inspect(references))
+---@param cursor Cursor
+function M.references(buf, cursor)
+  local references = request("textDocument/references", buf, cursor)
 
   local final_references = vim.tbl_map(function(reference)
     return {
@@ -56,7 +59,6 @@ function M.references(win, buf)
       file = string.gsub(reference.uri, "file://", ""),
     }
   end, references)
-  -- print(vim.inspect(final_references))
 
   return final_references
 end
