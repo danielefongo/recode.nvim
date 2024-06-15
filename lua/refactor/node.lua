@@ -50,11 +50,11 @@ end
 
 ---@return Node[]
 ---@param nodes Node[]
----@param node_type string
+---@param node_type string | nil
 ---@param filter function | nil
 function M:find_inside(nodes, node_type, filter)
   return filter_nodes(nodes, function(node)
-    return self.range:contains_range(node.range) and node.type == node_type
+    return self.range:contains_range(node.range) and (not node_type or node.type == node_type)
   end, filter)
 end
 
@@ -64,7 +64,7 @@ end
 ---@param filter function | nil
 function M:find_outside(nodes, node_type, filter)
   return filter_nodes(nodes, function(node)
-    return node.range:contains_range(self.range) and node.type == node_type
+    return node.range:contains_range(self.range) and (not node_type or node.type == node_type)
   end, filter)
 end
 

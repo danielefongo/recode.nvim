@@ -24,6 +24,10 @@ describe("node", function()
       assert.are.same({}, c:find_inside(nodes, "2"))
       assert.are.same({}, d:find_inside(nodes, "1"))
       assert.are.same({}, d:find_inside(nodes, "2"))
+
+      assert.are.same({ b, c, d, e }, a:find_inside(nodes))
+      assert.are.same({ d }, b:find_inside(nodes))
+      assert.are.same({ c, d }, e:find_inside(nodes))
     end)
 
     it("outside", function()
@@ -42,6 +46,12 @@ describe("node", function()
       assert.are.same({ a }, e:find_outside(nodes, "0"))
       assert.are.same({}, e:find_outside(nodes, "1"))
       assert.are.same({}, e:find_outside(nodes, "2"))
+
+      assert.are.same({}, a:find_outside(nodes))
+      assert.are.same({ a }, b:find_outside(nodes))
+      assert.are.same({ a, e }, c:find_outside(nodes))
+      assert.are.same({ a, b, e }, d:find_outside(nodes))
+      assert.are.same({ a }, e:find_outside(nodes))
     end)
 
     it("with filter", function()
