@@ -1,10 +1,10 @@
 ---@diagnostic disable: need-check-nil
 
-local parser = require("refactor.parser")
+local Parser = require("refactor.parser")
 local Cursor = require("refactor.cursor")
 local Node = require("refactor.node")
 local Lsp = require("refactor.lsp")
-local action = require("refactor.action")
+local Action = require("refactor.action")
 local M = {}
 
 local function exact_word_pattern(text)
@@ -20,7 +20,7 @@ function M.extract_match(source, range, opts)
       ((identifier) @declaration (#has-parent? @declaration parameter))
     ]]
 
-  local nodes = parser.get_nodes(source, "rust", query)
+  local nodes = Parser.get_nodes(source, "rust", query)
   local range_dummy = Node.dummy(range)
 
   local fun = Node.dummy(range):find_outside(nodes, "fun")[1]
@@ -41,7 +41,7 @@ function M.extract_match(source, range, opts)
   end)
 
   return {
-    action.insert(
+    Action.insert(
       source,
       Cursor.new(fun.range.end_line, fun.range.end_col),
       string.format(
@@ -64,8 +64,8 @@ fn %s(%s) -> _ {
         vim.treesitter.get_node_text(match.node, source)
       )
     ),
-    action.remove(source, match.range),
-    action.insert(
+    Action.remove(source, match.range),
+    Action.insert(
       source,
       Cursor.new(match.range.start_line, match.range.start_col),
       string.format(
@@ -87,9 +87,9 @@ function M.rename(source, range, opts)
 
   local actions = {}
   for _, reference in pairs(references or {}) do
-    actions[#actions + 1] = action.remove(reference.file, reference.range)
+    actions[#actions + 1] = Action.remove(reference.file, reference.range)
     actions[#actions + 1] =
-      action.insert(reference.file, Cursor.new(reference.range.start_line, reference.range.start_col), opts.name)
+      Action.insert(reference.file, Cursor.new(reference.range.start_line, reference.range.start_col), opts.name)
   end
 
   return actions
@@ -99,7 +99,7 @@ function M.swap(source, range, opts)
   local from = opts.from
   local to = opts.to
 
-  local nodes = parser.get_nodes(
+  local nodes = Parser.get_nodes(
     source,
     "rust",
     [[ ; query
@@ -116,14 +116,14 @@ function M.swap(source, range, opts)
   local to_param = params[to]
 
   local actions = {
-    action.replace(source, to_param.range, from_param.text),
-    action.replace(source, from_param.range, to_param.text),
+    Action.replace(source, to_param.range, from_param.text),
+    Action.replace(source, from_param.range, to_param.text),
   }
 
   local calls = Lsp.incoming_calls(source, name.range:beginning())
 
   for _, call in pairs(calls) do
-    local call_nodes = parser.get_nodes(
+    local call_nodes = Parser.get_nodes(
       call.file,
       "rust",
       [[ ; query
@@ -139,15 +139,15 @@ function M.swap(source, range, opts)
     local from_arg = args[from]
     local to_arg = args[to]
 
-    actions[#actions + 1] = action.replace(call.file, to_arg.range, from_arg.text)
-    actions[#actions + 1] = action.replace(call.file, from_arg.range, to_arg.text)
+    actions[#actions + 1] = Action.replace(call.file, to_arg.range, from_arg.text)
+    actions[#actions + 1] = Action.replace(call.file, from_arg.range, to_arg.text)
   end
 
   return actions
 end
 
 function M.inline_function(buffer, range)
-  local nodes = parser.get_nodes(
+  local nodes = Parser.get_nodes(
     buffer,
     "rust",
     [[ ; query
@@ -164,7 +164,7 @@ function M.inline_function(buffer, range)
 
   local function_definition = Lsp.definition(buffer, call_function.range:beginning())
 
-  local function_nodes = parser.get_nodes(
+  local function_nodes = Parser.get_nodes(
     function_definition.file,
     "rust",
     [[ ; query
@@ -194,12 +194,12 @@ function M.inline_function(buffer, range)
   end
 
   return {
-    action.replace(buffer, call.range, body_string),
+    Action.replace(buffer, call.range, body_string),
   }
 end
 
 function M.inline_var(buffer, range)
-  local nodes = parser.get_nodes(
+  local nodes = Parser.get_nodes(
     buffer,
     "rust",
     [[ ; query
@@ -215,7 +215,7 @@ function M.inline_var(buffer, range)
   local definition = Lsp.definition(buffer, identifier.range:beginning())
   local definition_dummy_node = Node.dummy(definition.range)
 
-  local new_nodes = parser.get_nodes(
+  local new_nodes = Parser.get_nodes(
     definition.file,
     "rust",
     [[ ; query
@@ -229,7 +229,7 @@ function M.inline_var(buffer, range)
   local value = fun:find_inside(new_nodes, "value")[1]
 
   return {
-    action.replace(buffer, identifier.range, value.text),
+    Action.replace(buffer, identifier.range, value.text),
   }
 end
 
