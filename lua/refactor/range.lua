@@ -1,3 +1,5 @@
+local Cursor = require("refactor.cursor")
+
 ---@class Range
 ---@field start_line integer
 ---@field start_col integer
@@ -68,6 +70,16 @@ end
 ---@return TreesitterRange
 function M:to_vim()
   return { self.start_line, self.start_col, self.end_line, self.end_col }
+end
+
+---@return Cursor
+function M:beginning()
+  return Cursor.new(self.start_line, self.start_col)
+end
+
+---@return Cursor
+function M:ending()
+  return Cursor.new(self.end_line, self.end_col)
 end
 
 ---@return string
