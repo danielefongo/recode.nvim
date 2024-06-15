@@ -53,7 +53,7 @@ describe("lsp", function()
       local definition = helpers.with_lsp(Lsp.definition, buf, Cursor.new(7, 13))
 
       assert.are.same({
-        range = Range.new(0, 0, 3, 1),
+        range = Range.new(0, 0, 2, 1),
         file = string.format("%s/lua/tests/example/src/common.rs", vim.fn.getcwd()),
       }, definition)
     end)
