@@ -63,8 +63,7 @@ function M:apply()
   local buf
 
   if type(self.source) == "number" then
-    ---@diagnostic disable-next-line: cast-local-type
-    buf = tonumber(self.source)
+    buf = tonumber(self.source) or 0
   else
     local file_path = self.source
     buf = vim.fn.bufnr(file_path)
