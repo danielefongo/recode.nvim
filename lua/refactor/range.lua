@@ -67,6 +67,13 @@ function M.from_cursor(cursor)
   return M.new(cursor.line, cursor.col, cursor.line, cursor.col)
 end
 
+---@return Range
+---@param from Cursor
+---@param to Cursor
+function M.from_cursors(from, to)
+  return M.new(from.line, from.col, to.line, to.col)
+end
+
 ---@return TreesitterRange
 function M:to_vim()
   return { self.start_line, self.start_col, self.end_line, self.end_col }

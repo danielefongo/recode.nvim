@@ -76,8 +76,9 @@ describe("range", function()
     end)
   end)
 
-  it("from cursor", function()
+  it("from cursor(s)", function()
     assert.are.same(Range.from_cursor(Cursor.new(1, 2)), Range.new(1, 2, 1, 2))
+    assert.are.same(Range.from_cursors(Cursor.new(1, 2), Cursor.new(5, 6)), Range.new(1, 2, 5, 6))
   end)
 
   it("to/from vim", function()
