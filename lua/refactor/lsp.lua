@@ -21,7 +21,7 @@ end
 
 ---@class LspElement
 ---@field range Range
----@field uri string
+---@field file string
 
 ---@return LspElement | nil
 ---@param buf integer
