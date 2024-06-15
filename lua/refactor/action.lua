@@ -59,10 +59,11 @@ end
 function M:apply()
   local create_new_buffer = false
 
-  ---@type number?
+  ---@type number
   local buf
 
   if type(self.source) == "number" then
+    ---@diagnostic disable-next-line: cast-local-type
     buf = tonumber(self.source)
   else
     local file_path = self.source
@@ -79,10 +80,6 @@ function M:apply()
   end
 
   local text = vim.split(self.text, "\n")
-
-  if not buf then
-    return
-  end
 
   vim.api.nvim_buf_set_text(
     buf,
