@@ -1,5 +1,5 @@
 local helpers = require("tests.helpers")
-local cursor = require("refactor.cursor")
+local cursor = require("recode.cursor")
 
 describe("cursor", function()
   helpers.setup()

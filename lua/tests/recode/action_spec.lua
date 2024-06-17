@@ -1,7 +1,7 @@
 local helpers = require("tests.helpers")
-local Action = require("refactor.action")
-local Range = require("refactor.range")
-local Cursor = require("refactor.cursor")
+local Action = require("recode.action")
+local Range = require("recode.range")
+local Cursor = require("recode.cursor")
 
 describe("action", function()
   helpers.setup()

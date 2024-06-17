@@ -1,7 +1,7 @@
 local helpers = require("tests.helpers")
-local Lsp = require("refactor.lsp")
-local Range = require("refactor.range")
-local Cursor = require("refactor.cursor")
+local Lsp = require("recode.lsp")
+local Range = require("recode.range")
+local Cursor = require("recode.cursor")
 
 describe("lsp", function()
   helpers.setup()

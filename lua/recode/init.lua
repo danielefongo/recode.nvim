@@ -1,7 +1,7 @@
-local Range = require("refactor.range")
-local Action = require("refactor.action")
-local Cursor = require("refactor.cursor")
-local Lenses = require("refactor.lenses")
+local Range = require("recode.range")
+local Action = require("recode.action")
+local Cursor = require("recode.cursor")
+local Lenses = require("recode.lenses")
 
 local M = {
   lenses = Lenses.new(),
@@ -31,20 +31,20 @@ end
 function M.spike()
   local buffer = vim.api.nvim_get_current_buf()
   local range = get_range()
-  local refactors = M.lenses:suggestions(buffer, range)
+  local recodes = M.lenses:suggestions(buffer, range)
 
-  if #refactors == 0 then
+  if #recodes == 0 then
     return
   end
 
   vim.ui.select(
-    vim.tbl_map(function(refactor)
-      return refactor.description()
-    end, refactors),
+    vim.tbl_map(function(recode)
+      return recode.description()
+    end, recodes),
     { prompt = "Refactor" },
     function(_, idx)
       if idx then
-        Action.apply_many(refactors[idx].apply(buffer, range))
+        Action.apply_many(recodes[idx].apply(buffer, range))
       end
     end
   )

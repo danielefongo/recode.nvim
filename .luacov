@@ -1,10 +1,10 @@
 return {
-  include = { "lua/refactor/.+$" },
+  include = { "lua/recode/.+$" },
   exclude = {
     "lua/tests/.+$",
   },
   modules = {
-    ["refactor.*"] = "lua/",
+    ["recode.*"] = "lua/",
   },
   includeuntestedfiles = true,
 }

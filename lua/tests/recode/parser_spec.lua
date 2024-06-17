@@ -1,5 +1,5 @@
 local helpers = require("tests.helpers")
-local Parser = require("refactor.parser")
+local Parser = require("recode.parser")
 
 describe("parser", function()
   helpers.setup()

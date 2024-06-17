@@ -1,9 +1,9 @@
 ---@diagnostic disable: need-check-nil
 
-local Parser = require("refactor.parser")
-local Node = require("refactor.node")
-local Lsp = require("refactor.lsp")
-local Action = require("refactor.action")
+local Parser = require("recode.parser")
+local Node = require("recode.node")
+local Lsp = require("recode.lsp")
+local Action = require("recode.action")
 
 ---@class RustInlineFunction : Refactor
 local M = {}

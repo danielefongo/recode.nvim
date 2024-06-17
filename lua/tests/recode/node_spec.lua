@@ -1,6 +1,6 @@
 local helpers = require("tests.helpers")
-local Range = require("refactor.range")
-local Node = require("refactor.node")
+local Range = require("recode.range")
+local Node = require("recode.node")
 
 describe("node", function()
   helpers.setup()

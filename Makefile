@@ -8,7 +8,7 @@ test:
 
 .PHONY: lint
 lint:
-	luacheck lua/refactor
+	luacheck lua/recode
 
 .PHONY: stylua
 stylua:
@@ -22,7 +22,7 @@ stylua-fix:
 testcov:
 	touch luacov.stats.out
 	SEQUENTIAL=1 TEST_COV=1 $(MAKE) --no-print-directory test
-	@luacov-console lua/refactor
+	@luacov-console lua/recode
 	@luacov-console -s
 	@luacov
 

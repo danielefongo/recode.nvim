@@ -1,10 +1,10 @@
 ---@diagnostic disable: need-check-nil
 
-local Action = require("refactor.action")
-local Cursor = require("refactor.cursor")
-local Lsp = require("refactor.lsp")
-local Node = require("refactor.node")
-local Parser = require("refactor.parser")
+local Action = require("recode.action")
+local Cursor = require("recode.cursor")
+local Lsp = require("recode.lsp")
+local Node = require("recode.node")
+local Parser = require("recode.parser")
 
 ---@class RustRename : Refactor
 local M = {}

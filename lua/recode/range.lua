@@ -1,4 +1,4 @@
-local Cursor = require("refactor.cursor")
+local Cursor = require("recode.cursor")
 
 ---@class Range
 ---@field start_line integer

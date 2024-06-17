@@ -1,9 +1,9 @@
 ---@diagnostic disable: need-check-nil
 
-local Parser = require("refactor.parser")
-local Cursor = require("refactor.cursor")
-local Node = require("refactor.node")
-local Action = require("refactor.action")
+local Parser = require("recode.parser")
+local Cursor = require("recode.cursor")
+local Node = require("recode.node")
+local Action = require("recode.action")
 
 ---@class RustExtractMatch : Refactor
 local M = {}

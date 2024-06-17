@@ -1,4 +1,4 @@
-local Range = require("refactor.range")
+local Range = require("recode.range")
 local M = {}
 
 ---@return table

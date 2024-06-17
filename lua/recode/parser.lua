@@ -1,5 +1,5 @@
-local Node = require("refactor.node")
-local Range = require("refactor.range")
+local Node = require("recode.node")
+local Range = require("recode.range")
 
 local M = {}
 
