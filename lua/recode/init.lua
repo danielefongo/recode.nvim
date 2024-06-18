@@ -31,20 +31,20 @@ end
 function M.spike()
   local buffer = vim.api.nvim_get_current_buf()
   local range = get_range()
-  local recodes = M.lenses:suggestions(buffer, range)
+  local refactors = M.lenses:suggestions(buffer, range)
 
-  if #recodes == 0 then
+  if #refactors == 0 then
     return
   end
 
   vim.ui.select(
-    vim.tbl_map(function(recode)
-      return recode.description()
-    end, recodes),
+    vim.tbl_map(function(refactor)
+      return refactor.description()
+    end, refactors),
     { prompt = "Refactor" },
     function(_, idx)
       if idx then
-        Action.apply_many(recodes[idx].apply(buffer, range))
+        Action.apply_many(refactors[idx].apply(buffer, range))
       end
     end
   )

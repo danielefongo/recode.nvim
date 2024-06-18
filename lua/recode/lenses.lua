@@ -1,26 +1,26 @@
 ---@class Lenses
----@field recodes Refactor[]
+---@field refactors Refactor[]
 local M = {}
 M.__index = M
 
 ---@return Lenses
 function M.new()
   local self = setmetatable({}, M)
-  self.recodes = {}
+  self.refactors = {}
   return self
 end
 
----@param recode Refactor
+---@param refactor Refactor
 ---@return Lenses
-function M:register(recode)
-  return self:register_many({ recode })
+function M:register(refactor)
+  return self:register_many({ refactor })
 end
 
----@param recodes Refactor[]
+---@param refactors Refactor[]
 ---@return Lenses
-function M:register_many(recodes)
-  for _, recode in pairs(recodes) do
-    self.recodes[#self.recodes + 1] = recode
+function M:register_many(refactors)
+  for _, refactor in pairs(refactors) do
+    self.refactors[#self.refactors + 1] = refactor
   end
   return self
 end
@@ -29,14 +29,14 @@ end
 ---@param range Range
 ---@return Refactor[]
 function M:suggestions(source, range)
-  return vim.tbl_filter(function(recode)
-    return recode.is_valid(source, range)
-  end, self.recodes)
+  return vim.tbl_filter(function(refactor)
+    return refactor.is_valid(source, range)
+  end, self.refactors)
 end
 
 ---@return Refactor[]
 function M:all()
-  return self.recodes
+  return self.refactors
 end
 
 return M
