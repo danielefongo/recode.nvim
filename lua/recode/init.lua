@@ -7,14 +7,6 @@ local M = {
   lenses = Lenses.new(),
 }
 
-M.lenses:register_many({
-  require("tests.example.extract_match"),
-  require("tests.example.inline_function"),
-  require("tests.example.inline_var"),
-  require("tests.example.rename"),
-  require("tests.example.swap_parameter"),
-})
-
 local function get_range()
   local mode = vim.fn.mode()
   if mode == "v" or mode == "V" or mode == "" or vim.fn.visualmode() ~= "" then
@@ -26,6 +18,10 @@ local function get_range()
     local cursor = Cursor.from_vim(vim_cursor)
     return Range.from_cursor(cursor)
   end
+end
+
+function M.register(refactors)
+  M.lenses:register_many(refactors)
 end
 
 function M.run()
