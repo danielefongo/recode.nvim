@@ -41,7 +41,7 @@ function helpers.with_lsp(lambda, ...)
     first_lsp_call = false
 
     coroutine.resume(co)
-  end, (first_lsp_call and 1000) or 0)
+  end, (first_lsp_call and 5000) or 0)
 
   coroutine.yield()
   return out
