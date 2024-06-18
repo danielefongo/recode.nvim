@@ -7,7 +7,7 @@ describe("action", function()
   helpers.setup()
 
   local function assert_text_in_buf(buffer, text)
-    assert.are.same(text, table.concat(vim.api.nvim_buf_get_lines(buffer, 0, -1, true), "\n"))
+    assert.are.same(text, helpers.buf_read(buffer))
   end
 
   local function assert_text_in_file(file, text)

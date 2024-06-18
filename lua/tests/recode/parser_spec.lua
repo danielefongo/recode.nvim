@@ -149,7 +149,7 @@ fn my_function(param1: i32, param2: i32) -> i32 {
     end)
 
     it("using filename", function()
-      local filename = helpers.temp_file("")
+      local filename = "any/filename.rs"
       helpers.buf_with_fake_file(
         filename,
         "rust",

@@ -56,7 +56,7 @@ end
 
 function helpers.buf_with_fake_file(filename, ft, text)
   local buffer, win = helpers.buf_with_text(text)
-  vim.api.nvim_buf_set_name(buffer, filename)
+  vim.api.nvim_buf_set_name(buffer, vim.fn.getcwd() .. "/" .. filename)
   vim.api.nvim_set_option_value("filetype", ft, { buf = buffer })
   return buffer, win
 end
@@ -73,6 +73,10 @@ end
 
 function helpers.buf_write(buffer, text)
   vim.api.nvim_buf_set_lines(buffer, 0, -1, true, vim.split(text, "\n"))
+end
+
+function helpers.buf_read(buffer)
+  return table.concat(vim.api.nvim_buf_get_lines(buffer, 0, -1, true), "\n")
 end
 
 function helpers.temp_file(content)
