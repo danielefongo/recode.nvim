@@ -14,13 +14,7 @@ describe("rust", function()
   local buffer = helpers.buf_with_file("lua/tests/example/src/lsp.rs", "rust")
 
   it("extract", function()
-    local input_mock = mock(vim.fn, true)
-    input_mock.input = function()
-      return "extracted"
-    end
-
-    local actions = helpers.with_lsp(RustExtractMatch.apply, buffer, Range.new(5, 0, 10, 100))
-    mock.revert(input_mock)
+    local actions = helpers.with_lsp(RustExtractMatch.apply, buffer, Range.new(5, 0, 10, 100), { name = "extracted" })
 
     assert.are.same({
       Action.insert(buffer, Cursor.new(14, 1), "\n\n" .. [[
@@ -36,13 +30,7 @@ fn extracted(param1: i32, param3: i32) -> _ {
   end)
 
   it("rename", function()
-    local input_mock = mock(vim.fn, true)
-    input_mock.input = function()
-      return "renamed"
-    end
-
-    local actions = helpers.with_lsp(RustRename.apply, buffer, Range.new(7, 21, 7, 21))
-    mock.revert(input_mock)
+    local actions = helpers.with_lsp(RustRename.apply, buffer, Range.new(7, 21, 7, 21), { name = "renamed" })
 
     assert.are.same({
       Action.remove(vim.fn.getcwd() .. "/lua/tests/example/src/lsp.rs", Range.new(7, 21, 7, 27)),
@@ -53,16 +41,7 @@ fn extracted(param1: i32, param3: i32) -> _ {
   end)
 
   it("swap parameter", function()
-    local input_mock = mock(vim.fn, true)
-    local count = 1
-    input_mock.input = function()
-      local out = tostring(count)
-      count = count + 1
-      return out
-    end
-
-    local actions = helpers.with_lsp(RustSwapParameter.apply, buffer, Range.new(7, 21, 7, 21))
-    mock.revert(input_mock)
+    local actions = helpers.with_lsp(RustSwapParameter.apply, buffer, Range.new(7, 21, 7, 21), { from = 1, to = 2 })
 
     assert.are.same({
       Action.replace(buffer, Range.new(2, 32, 2, 43), "param1: i32"),

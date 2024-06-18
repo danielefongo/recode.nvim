@@ -12,6 +12,10 @@ function M.description()
   return "Rust inline var"
 end
 
+function M.prompt()
+  return {}
+end
+
 function M.is_valid(source, range)
   local nodes = Parser.get_nodes(
     source,

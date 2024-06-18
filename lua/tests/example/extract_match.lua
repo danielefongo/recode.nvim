@@ -12,6 +12,12 @@ function M.description()
   return "Rust extract match"
 end
 
+function M.prompt()
+  local name = vim.fn.input("Name: ")
+
+  return { name = name }
+end
+
 function M.is_valid(source, range)
   local nodes = Parser.get_nodes(
     source,
@@ -31,9 +37,7 @@ function M.is_valid(source, range)
   return range_dummy:find_largest_inside(matches) ~= nil
 end
 
-function M.apply(source, range)
-  local name = vim.fn.input("Name: ")
-
+function M.apply(source, range, opts)
   local nodes = Parser.get_nodes(
     source,
     "rust",
@@ -75,7 +79,7 @@ function M.apply(source, range)
 fn %s(%s) -> _ {
   %s
 }]],
-        name,
+        opts.name,
         table.concat(
           vim.tbl_map(function(var)
             local type = vim.treesitter.get_node_text(var.node:next_named_sibling(), source)
@@ -94,7 +98,7 @@ fn %s(%s) -> _ {
       Cursor.new(match.range.start_line, match.range.start_col),
       string.format(
         "%s(%s)",
-        name,
+        opts.name,
         table.concat(
           vim.tbl_map(function(var)
             return vim.treesitter.get_node_text(var.node, source)

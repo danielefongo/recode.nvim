@@ -13,6 +13,13 @@ function M.description()
   return "Rust swap parameter"
 end
 
+function M.prompt()
+  local from = tonumber(vim.fn.input("From: "))
+  local to = tonumber(vim.fn.input("To: "))
+
+  return { from = from, to = to }
+end
+
 function M.is_valid(source, range)
   local nodes = Parser.get_nodes(
     source,
@@ -28,9 +35,9 @@ function M.is_valid(source, range)
   return #params > 1
 end
 
-function M.apply(source, range)
-  local from = tonumber(vim.fn.input("From: "))
-  local to = tonumber(vim.fn.input("To: "))
+function M.apply(source, range, opts)
+  local from = opts.from
+  local to = opts.to
 
   local nodes = Parser.get_nodes(
     source,

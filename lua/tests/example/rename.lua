@@ -13,6 +13,12 @@ function M.description()
   return "Rust rename"
 end
 
+function M.prompt()
+  local name = vim.fn.input("Name: ")
+
+  return { name = name }
+end
+
 function M.is_valid(source, range)
   local nodes = Parser.get_nodes(
     source,
@@ -25,16 +31,14 @@ function M.is_valid(source, range)
   return Node.dummy(range):find_smallest_outside(nodes, "identifier") ~= nil
 end
 
-function M.apply(source, range)
-  local name = vim.fn.input("Name: ")
-
+function M.apply(source, range, opts)
   local references = Lsp.references(source, Cursor.new(range.start_line, range.start_col))
 
   local actions = {}
   for _, reference in pairs(references or {}) do
     actions[#actions + 1] = Action.remove(reference.file, reference.range)
     actions[#actions + 1] =
-      Action.insert(reference.file, Cursor.new(reference.range.start_line, reference.range.start_col), name)
+      Action.insert(reference.file, Cursor.new(reference.range.start_line, reference.range.start_col), opts.name)
   end
 
   return actions

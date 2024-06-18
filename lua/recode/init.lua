@@ -44,7 +44,8 @@ function M.spike()
     { prompt = "Refactor" },
     function(_, idx)
       if idx then
-        Action.apply_many(refactors[idx].apply(buffer, range))
+        local opts = refactors[idx].prompt()
+        Action.apply_many(refactors[idx].apply(buffer, range, opts))
       end
     end
   )
