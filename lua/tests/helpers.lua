@@ -1,3 +1,5 @@
+local Action = require("recode.action")
+
 local function setup_test_cov()
   after_each(function()
     if os.getenv("TEST_COV") then
@@ -77,6 +79,21 @@ end
 
 function helpers.buf_read(buffer)
   return table.concat(vim.api.nvim_buf_get_lines(buffer, 0, -1, true), "\n")
+end
+
+function helpers.buf_apply_actions(buffer, actions)
+  local filename = vim.api.nvim_buf_get_name(buffer)
+  local valid_actions = vim.tbl_map(
+    function(action)
+      return action
+    end,
+    vim.tbl_filter(function(action)
+      return action.source == buffer or action.source == filename
+    end, actions)
+  )
+
+  Action.apply_many(valid_actions)
+  return buffer
 end
 
 function helpers.temp_file(content)

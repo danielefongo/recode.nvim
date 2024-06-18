@@ -1,7 +1,4 @@
-local mock = require("luassert.mock")
 local helpers = require("tests.helpers")
-local Action = require("recode.action")
-local Cursor = require("recode.cursor")
 local Range = require("recode.range")
 local RustExtractMatch = require("tests.example.extract_match")
 local RustInlineFunction = require("tests.example.inline_function")
@@ -9,66 +6,213 @@ local RustInlineVar = require("tests.example.inline_var")
 local RustRename = require("tests.example.rename")
 local RustSwapParameter = require("tests.example.swap_parameter")
 
+local function register_buffer(buffers, filename, text)
+  buffers[filename] = helpers.buf_with_fake_file(filename, "rust", text)
+  return buffers[filename]
+end
+
+local function apply_actions(buffers, actions)
+  for _, buffer in pairs(buffers) do
+    helpers.buf_apply_actions(buffer, actions)
+  end
+end
+
 describe("rust", function()
   helpers.setup()
-  local buffer = helpers.buf_with_file("lua/tests/example/src/lsp.rs", "rust")
+
+  local buffers = {}
+
+  after_each(function()
+    for _, buffer in pairs(buffers) do
+      vim.api.nvim_buf_delete(buffer, { force = false, unload = true })
+    end
+    buffers = {}
+  end)
 
   it("extract", function()
-    local actions = helpers.with_lsp(RustExtractMatch.apply, buffer, Range.new(5, 0, 10, 100), { name = "extracted" })
+    local main = register_buffer(
+      buffers,
+      "lua/tests/example/src/code.rs",
+      [[
+use crate::common::add_one;
 
-    assert.are.same({
-      Action.insert(buffer, Cursor.new(14, 1), "\n\n" .. [[
+pub fn my_function(param1: i32, param2: i32) {
+    let param3: i32 = 3;
+    let param4: i32 = 3;
+    let x = match param1 {
+        1 => 1,
+        _ => add_one(param3),
+    };
+    match 1 {
+        1 => 1,
+        _ => add_one(param4),
+    };
+    let add_one: fn(i32) -> i32 = |_| 42;
+}]]
+    )
+
+    local actions = helpers.with_lsp(RustExtractMatch.apply, main, Range.new(5, 0, 10, 100), { name = "extracted" })
+
+    apply_actions(buffers, actions)
+
+    assert.are.same(
+      [[
+use crate::common::add_one;
+
+pub fn my_function(param1: i32, param2: i32) {
+    let param3: i32 = 3;
+    let param4: i32 = 3;
+    let x = extracted(param1, param3);
+    match 1 {
+        1 => 1,
+        _ => add_one(param4),
+    };
+    let add_one: fn(i32) -> i32 = |_| 42;
+}
+
 fn extracted(param1: i32, param3: i32) -> _ {
   match param1 {
         1 => 1,
         _ => add_one(param3),
     }
-}]]),
-      Action.remove(buffer, Range.new(5, 12, 8, 5)),
-      Action.insert(buffer, Cursor.new(5, 12), [[extracted(param1, param3)]]),
-    }, actions)
+}]],
+      helpers.buf_read(main)
+    )
   end)
 
   it("rename", function()
-    local actions = helpers.with_lsp(RustRename.apply, buffer, Range.new(7, 21, 7, 21), { name = "renamed" })
+    local main = register_buffer(
+      buffers,
+      "lua/tests/example/src/code.rs",
+      [[
+pub fn my_function(param1: i32, param2: i32) {
+  let param2 = param2 + 1;
+}]]
+    )
 
-    assert.are.same({
-      Action.remove(vim.fn.getcwd() .. "/lua/tests/example/src/lsp.rs", Range.new(7, 21, 7, 27)),
-      Action.insert(vim.fn.getcwd() .. "/lua/tests/example/src/lsp.rs", Cursor.new(7, 21), "renamed"),
-      Action.remove(vim.fn.getcwd() .. "/lua/tests/example/src/lsp.rs", Range.new(3, 8, 3, 14)),
-      Action.insert(vim.fn.getcwd() .. "/lua/tests/example/src/lsp.rs", Cursor.new(3, 8), "renamed"),
-    }, actions)
+    local actions = helpers.with_lsp(RustRename.apply, main, Range.new(1, 15, 1, 16), { name = "renamed" })
+
+    apply_actions(buffers, actions)
+
+    assert.are.same(
+      [[
+pub fn my_function(param1: i32, renamed: i32) {
+  let param2 = renamed + 1;
+}]],
+      helpers.buf_read(main)
+    )
   end)
 
   it("swap parameter", function()
-    local actions = helpers.with_lsp(RustSwapParameter.apply, buffer, Range.new(7, 21, 7, 21), { from = 1, to = 2 })
+    local lib = register_buffer(
+      buffers,
+      "lua/tests/example/src/user.rs",
+      [[
+use crate::code;
+pub fn main() {
+  let _ = code::my_function(1, 2);
+}]]
+    )
 
-    assert.are.same({
-      Action.replace(buffer, Range.new(2, 32, 2, 43), "param1: i32"),
-      Action.replace(buffer, Range.new(2, 19, 2, 30), "param2: i32"),
-      Action.replace(vim.fn.getcwd() .. "/lua/tests/example/src/lib.rs", Range.new(6, 19, 6, 20), "1"),
-      Action.replace(vim.fn.getcwd() .. "/lua/tests/example/src/lib.rs", Range.new(6, 16, 6, 17), "2"),
-    }, actions)
+    local main = register_buffer(
+      buffers,
+      "lua/tests/example/src/code.rs",
+      [[
+pub fn my_function(param1: i32, param2: i32) {
+  let param2 = param2 + 1;
+}]]
+    )
+
+    local actions = helpers.with_lsp(RustSwapParameter.apply, main, Range.new(1, 0, 1, 0), { from = 1, to = 2 })
+
+    apply_actions(buffers, actions)
+
+    assert.are.same(
+      [[
+pub fn my_function(param2: i32, param1: i32) {
+  let param2 = param2 + 1;
+}]],
+      helpers.buf_read(main)
+    )
+
+    assert.are.same(
+      [[
+use crate::code;
+pub fn main() {
+  let _ = code::my_function(2, 1);
+}]],
+      helpers.buf_read(lib)
+    )
   end)
 
   it("inline function", function()
-    local actions = helpers.with_lsp(RustInlineFunction.apply, buffer, Range.new(7, 15, 7, 15))
-    assert.are.same({
-      Action.replace(
-        buffer,
-        Range.new(7, 13, 7, 28),
-        [[{
+    local main = register_buffer(
+      buffers,
+      "lua/tests/example/src/code.rs",
+      [[
+use crate::shared::add_one;
+
+pub fn my_function(param1: i32, param2: i32) {
+    add_one(param3);
+}
+]]
+    )
+
+    register_buffer(
+      buffers,
+      "lua/tests/example/src/shared.rs",
+      [[
+pub fn add_one(param1: i32) -> i32 {
+    let param3 = 4;
+    param1 + 1
+}]]
+    )
+
+    local actions = helpers.with_lsp(RustInlineFunction.apply, main, Range.new(3, 4, 3, 4), { from = 1, to = 2 })
+
+    apply_actions(buffers, actions)
+
+    assert.are.same(
+      [[
+use crate::shared::add_one;
+
+pub fn my_function(param1: i32, param2: i32) {
+    {
     let param3_2 = 4;
     param3 + 1
-}]]
-      ),
-    }, actions)
+};
+}
+]],
+      helpers.buf_read(main)
+    )
   end)
 
   it("inline var", function()
-    local actions = helpers.with_lsp(RustInlineVar.apply, buffer, Range.new(7, 21, 7, 21))
-    assert.are.same({
-      Action.replace(buffer, Range.new(7, 21, 7, 27), "3"),
-    }, actions)
+    local main = register_buffer(
+      buffers,
+      "lua/tests/example/src/code.rs",
+      [[
+use crate::common::add_one;
+
+pub fn my_function() {
+    let var1: i32 = 1;
+    let var2: i32 = var1 + 2;
+}]]
+    )
+
+    local actions = helpers.with_lsp(RustInlineVar.apply, main, Range.new(4, 20, 4, 20))
+
+    apply_actions(buffers, actions)
+
+    assert.are.same(
+      [[
+use crate::common::add_one;
+
+pub fn my_function() {
+    let var1: i32 = 1;
+    let var2: i32 = 1 + 2;
+}]],
+      helpers.buf_read(main)
+    )
   end)
 end)

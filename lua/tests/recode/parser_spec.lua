@@ -190,7 +190,12 @@ fn my_function(param1: i32, param2: i32) -> i32 {
           body: (_) @body)
     ]]
 
-    local nodes = parse("./lua/tests/example/src/parser.rs", ft, query)
+    local filename = helpers.temp_file([[
+fn my_function(param1: i32, param2: i32) -> i32 {
+    param1 + param2
+}]])
+
+    local nodes = parse(filename, ft, query)
     assert.are.same({
       { type = "fun_name", range = { 0, 3, 0, 14 } },
       { type = "param", range = { 0, 15, 0, 26 } },
