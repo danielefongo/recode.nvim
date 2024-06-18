@@ -28,7 +28,7 @@ local function get_range()
   end
 end
 
-function M.spike()
+function M.run()
   local buffer = vim.api.nvim_get_current_buf()
   local range = get_range()
   local refactors = M.lenses:suggestions(buffer, range)
