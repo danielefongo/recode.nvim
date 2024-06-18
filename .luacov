@@ -2,6 +2,8 @@ return {
   include = { "lua/recode/.+$" },
   exclude = {
     "lua/tests/.+$",
+    "lua/recode/init",
+    "lua/recode/refactor",
   },
   modules = {
     ["recode.*"] = "lua/",
