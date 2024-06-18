@@ -7,8 +7,8 @@ describe("lsp", function()
   helpers.setup()
   local buf, win = helpers.buf_with_file("./lua/tests/example/src/lsp.rs", "rust")
 
-  describe("same file", function()
-    it("definition", function()
+  describe("definition", function()
+    it("same file", function()
       local definition = helpers.with_lsp(Lsp.definition, buf, Cursor.new(5, 18))
 
       assert.are.same({
@@ -17,7 +17,18 @@ describe("lsp", function()
       }, definition)
     end)
 
-    it("references", function()
+    it("other file", function()
+      local definition = helpers.with_lsp(Lsp.definition, buf, Cursor.new(7, 13))
+
+      assert.are.same({
+        range = Range.new(0, 0, 3, 1),
+        file = string.format("%s/lua/tests/example/src/common.rs", vim.fn.getcwd()),
+      }, definition)
+    end)
+  end)
+
+  describe("references", function()
+    it("same file", function()
       local references = helpers.with_lsp(Lsp.references, buf, Cursor.new(5, 18))
 
       assert.are.same({
@@ -32,33 +43,7 @@ describe("lsp", function()
       }, references)
     end)
 
-    it("incoming calls", function()
-      local references = helpers.with_lsp(Lsp.incoming_calls, buf, Cursor.new(7, 14))
-
-      assert.are.same({
-        {
-          range = Range.new(7, 13, 7, 20),
-          file = string.format("%s/lua/tests/example/src/lsp.rs", vim.fn.getcwd()),
-        },
-        {
-          range = Range.new(11, 13, 11, 20),
-          file = string.format("%s/lua/tests/example/src/lsp.rs", vim.fn.getcwd()),
-        },
-      }, references)
-    end)
-  end)
-
-  describe("other file", function()
-    it("definition", function()
-      local definition = helpers.with_lsp(Lsp.definition, buf, Cursor.new(7, 13))
-
-      assert.are.same({
-        range = Range.new(0, 0, 3, 1),
-        file = string.format("%s/lua/tests/example/src/common.rs", vim.fn.getcwd()),
-      }, definition)
-    end)
-
-    it("references", function()
+    it("other file", function()
       local references = helpers.with_lsp(Lsp.references, buf, Cursor.new(7, 13))
 
       assert.are.same({
@@ -80,8 +65,25 @@ describe("lsp", function()
         },
       }, references)
     end)
+  end)
 
-    it("incoming calls", function()
+  describe("incoming calls", function()
+    it("same file", function()
+      local references = helpers.with_lsp(Lsp.incoming_calls, buf, Cursor.new(7, 14))
+
+      assert.are.same({
+        {
+          range = Range.new(7, 13, 7, 20),
+          file = string.format("%s/lua/tests/example/src/lsp.rs", vim.fn.getcwd()),
+        },
+        {
+          range = Range.new(11, 13, 11, 20),
+          file = string.format("%s/lua/tests/example/src/lsp.rs", vim.fn.getcwd()),
+        },
+      }, references)
+    end)
+
+    it("other file", function()
       local references = helpers.with_lsp(Lsp.incoming_calls, buf, Cursor.new(2, 7))
 
       assert.are.same({
