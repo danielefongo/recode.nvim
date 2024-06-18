@@ -54,6 +54,13 @@ function helpers.buf_with_text(text)
   return buffer, win
 end
 
+function helpers.buf_with_fake_file(filename, ft, text)
+  local buffer, win = helpers.buf_with_text(text)
+  vim.api.nvim_buf_set_name(buffer, filename)
+  vim.api.nvim_set_option_value("filetype", ft, { buf = buffer })
+  return buffer, win
+end
+
 function helpers.buf_with_file(file, ft)
   local buffer = vim.api.nvim_create_buf(false, true)
   local win = vim.api.nvim_get_current_win()

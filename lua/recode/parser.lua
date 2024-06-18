@@ -35,11 +35,19 @@ function M.get_nodes(source, ft, raw_query)
   if type(source) == "number" then
     root = ts.get_parser(source, lang):parse()[1]:root()
   else
-    local file = io.open(source, "r")
-    if file then
-      source = file:read("*a")
+    local file_path = source
+    local buf = vim.fn.bufnr(file_path)
+
+    if buf == -1 then
+      local file = io.open(source, "r")
+      if file then
+        source = file:read("*a")
+      end
+      root = ts.get_string_parser(source, lang):parse()[1]:root()
+    else
+      source = buf
+      root = ts.get_parser(buf, lang):parse()[1]:root()
     end
-    root = ts.get_string_parser(source, lang):parse()[1]:root()
   end
   local query = parse(lang, raw_query)
 
